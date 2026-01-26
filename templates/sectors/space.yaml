@@ -1,0 +1,10 @@
+name: "Space & Aerospace"
+description: "Satellite communications, launch services"
+companies:
+  - ticker: ASTS
+    name: "AST SpaceMobile"
+  - ticker: RKLB
+    name: "Rocket Lab"
+recommended_drivers:
+  revenue:
+    formula: "user_growth × arpu × capacity_utilization × 12"

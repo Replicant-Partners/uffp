@@ -1,0 +1,14 @@
+{
+  "name": "@forecast-intel/plugin-eliza",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@elizaos/core": "latest",
+    "@forecast-intel/core": "workspace:*"
+  }
+}

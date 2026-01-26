@@ -1,0 +1,10 @@
+name: "Software as a Service"
+description: "Subscription-based software"
+companies:
+  - ticker: SNOW
+    name: "Snowflake"
+  - ticker: CRM
+    name: "Salesforce"
+recommended_drivers:
+  arr:
+    formula: "(user_growth - (user_growth × churn_rate)) × arpu × 12"

@@ -1,0 +1,10 @@
+name: "Financial Technology"
+description: "Digital payments and financial services"
+companies:
+  - ticker: SQ
+    name: "Block (Square)"
+  - ticker: PYPL
+    name: "PayPal"
+recommended_drivers:
+  revenue:
+    formula: "tpv × take_rate"

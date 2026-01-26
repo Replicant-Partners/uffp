@@ -1,0 +1,28 @@
+{
+  "name": "forecast-intelligence-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal probabilistic forecasting using Tetlock methodology",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "lerna run build",
+    "dev": "lerna run dev --parallel",
+    "test": "lerna run test",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "setup": "./scripts/setup.sh",
+    "examples": "node examples/usage-examples.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "lerna": "^7.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
