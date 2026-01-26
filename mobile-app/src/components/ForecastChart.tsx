@@ -1,20 +1,21 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
-import { SimulationResult } from '../types';
+import React from "react";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { BarChart } from "react-native-chart-kit";
+import { SimulationResult } from "../types";
+import { TufteColors, TufteTypography, TufteSpacing, TufteChartConfig } from "../styles/tufte";
 
 interface ForecastChartProps {
   result: SimulationResult;
   ticker: string;
 }
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 
 export const ForecastChart: React.FC<ForecastChartProps> = ({ result, ticker }) => {
   const toMillions = (value: number) => value / 1_000_000;
 
   const chartData = {
-    labels: ['P10\nBear', 'P50\nBase', 'P90\nBull'],
+    labels: ["P10", "P50", "P90"],
     datasets: [
       {
         data: [toMillions(result.p10), toMillions(result.p50), toMillions(result.p90)],
@@ -23,99 +24,138 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ result, ticker }) 
   };
 
   const chartConfig = {
-    backgroundColor: '#1a1a2e',
-    backgroundGradientFrom: '#16213e',
-    backgroundGradientTo: '#0f3460',
-    decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
-    propsForLabels: {
-      fontSize: 10,
-    },
+    ...TufteChartConfig,
+    barPercentage: 0.5,
+    fillShadowGradientOpacity: 0,
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{ticker} Revenue Forecast</Text>
-      <Text style={styles.subtitle}>Monte Carlo Simulation (10k iterations)</Text>
+      {/* Title as marginal note */}
+      <Text style={styles.label}>Revenue Forecast · {ticker}</Text>
 
+      {/* Data table above chart (Tufte: show numbers directly) */}
+      <View style={styles.dataTable}>
+        <View style={styles.dataRow}>
+          <Text style={styles.dataLabel}>P10 (Bear)</Text>
+          <Text style={styles.dataValue}>${toMillions(result.p10).toFixed(1)}M</Text>
+        </View>
+        <View style={styles.dataRow}>
+          <Text style={styles.dataLabel}>P50 (Base)</Text>
+          <Text style={styles.dataValue}>${toMillions(result.p50).toFixed(1)}M</Text>
+        </View>
+        <View style={styles.dataRow}>
+          <Text style={styles.dataLabel}>P90 (Bull)</Text>
+          <Text style={styles.dataValue}>${toMillions(result.p90).toFixed(1)}M</Text>
+        </View>
+      </View>
+
+      {/* Minimal bar chart (data-ink only) */}
       <BarChart
         data={chartData}
-        width={screenWidth - 40}
-        height={220}
+        width={screenWidth - TufteSpacing.lg * 2}
+        height={160}
         yAxisLabel="$"
         yAxisSuffix="M"
         chartConfig={chartConfig}
         style={styles.chart}
-        showValuesOnTopOfBars
+        showValuesOnTopOfBars={false}
         fromZero
+        withInnerLines={false}
+        withHorizontalLabels={true}
+        withVerticalLabels={true}
+        segments={3}
       />
 
-      <View style={styles.statsContainer}>
+      {/* Statistical summary (tabular) */}
+      <View style={styles.statsTable}>
         <View style={styles.statRow}>
-          <Text style={styles.statLabel}>Mean:</Text>
-          <Text style={styles.statValue}>${toMillions(result.mean).toFixed(2)}M</Text>
+          <Text style={styles.statLabel}>μ (mean)</Text>
+          <Text style={styles.statValue}>${toMillions(result.mean).toFixed(1)}M</Text>
         </View>
         <View style={styles.statRow}>
-          <Text style={styles.statLabel}>Std Dev:</Text>
-          <Text style={styles.statValue}>${toMillions(result.stdDev).toFixed(2)}M</Text>
+          <Text style={styles.statLabel}>σ (std dev)</Text>
+          <Text style={styles.statValue}>${toMillions(result.stdDev).toFixed(1)}M</Text>
         </View>
         <View style={styles.statRow}>
-          <Text style={styles.statLabel}>Confidence Range:</Text>
+          <Text style={styles.statLabel}>Range</Text>
           <Text style={styles.statValue}>
             {(((result.p90 - result.p10) / result.p50) * 100).toFixed(0)}% variance
           </Text>
         </View>
       </View>
+
+      {/* Footnote */}
+      <Text style={styles.footnote}>10,000 iterations · Independent drivers multiplied</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#16213e',
-    borderRadius: 16,
-    marginVertical: 10,
+    backgroundColor: TufteColors.paper,
+    padding: TufteSpacing.lg,
+    marginVertical: TufteSpacing.md,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: TufteColors.border,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
+  label: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: TufteSpacing.md,
   },
-  subtitle: {
-    fontSize: 12,
-    color: '#aaa',
-    marginBottom: 16,
+  dataTable: {
+    marginBottom: TufteSpacing.md,
+  },
+  dataRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: TufteSpacing.xs,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TufteColors.grid,
+  },
+  dataLabel: {
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.textSecondary,
+  },
+  dataValue: {
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.text,
+    fontWeight: TufteTypography.fontWeight.semibold,
+    fontVariant: ["tabular-nums"],
   },
   chart: {
-    borderRadius: 16,
-    marginVertical: 8,
+    marginVertical: TufteSpacing.md,
+    marginLeft: -TufteSpacing.md,
   },
-  statsContainer: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: '#0f3460',
-    borderRadius: 12,
+  statsTable: {
+    marginTop: TufteSpacing.md,
+    paddingTop: TufteSpacing.md,
+    borderTopWidth: 1,
+    borderTopColor: TufteColors.border,
   },
   statRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a2e',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: TufteSpacing.xs,
   },
   statLabel: {
-    fontSize: 14,
-    color: '#aaa',
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    fontStyle: "italic",
   },
   statValue: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1aff92',
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  footnote: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    marginTop: TufteSpacing.sm,
+    fontStyle: "italic",
   },
 });

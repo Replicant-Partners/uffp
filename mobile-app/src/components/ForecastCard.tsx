@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ForecastConfig } from '../types';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { ForecastConfig } from "../types";
+import { TufteColors, TufteTypography, TufteSpacing, TufteLayout } from "../styles/tufte";
 
 interface ForecastCardProps {
   config: ForecastConfig;
@@ -8,112 +9,110 @@ interface ForecastCardProps {
 }
 
 export const ForecastCard: React.FC<ForecastCardProps> = ({ config, onPress }) => {
+  const formatDate = (date: string) => {
+    return new Date(date).getFullYear().toString();
+  };
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <View style={styles.header}>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+      {/* Header - Ticker and Target */}
+      <View style={styles.headerRow}>
         <Text style={styles.ticker}>{config.ticker}</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{config.targetMetric.toUpperCase()}</Text>
+        <Text style={styles.targetValue}>${config.targetValue}M</Text>
+      </View>
+
+      {/* Metadata table */}
+      <View style={styles.table}>
+        <View style={styles.tableRow}>
+          <Text style={styles.tableLabel}>Target</Text>
+          <Text style={styles.tableValue}>
+            {config.targetMetric} ≥ ${config.targetValue}M by {formatDate(config.targetDate)}
+          </Text>
+        </View>
+
+        <View style={styles.tableRow}>
+          <Text style={styles.tableLabel}>Drivers</Text>
+          <Text style={styles.tableValue}>{config.drivers.map((d) => d.name).join(" · ")}</Text>
+        </View>
+
+        <View style={styles.tableRow}>
+          <Text style={styles.tableLabel}>Base Rate</Text>
+          <Text style={styles.tableValue}>
+            {(config.baserate.probability * 100).toFixed(0)}% historical success
+          </Text>
+        </View>
+
+        <View style={styles.tableRow}>
+          <Text style={styles.tableLabel}>Method</Text>
+          <Text style={styles.tableValue}>
+            Monte Carlo · {config.drivers.length} independent drivers
+          </Text>
         </View>
       </View>
 
-      <Text style={styles.target}>
-        Target: ${config.targetValue}M by {new Date(config.targetDate).getFullYear()}
-      </Text>
-
-      <View style={styles.driversContainer}>
-        <Text style={styles.driversLabel}>Drivers:</Text>
-        {config.drivers.slice(0, 2).map((driver, index) => (
-          <Text key={index} style={styles.driverText}>
-            • {driver.name} ({driver.distributionType})
-          </Text>
-        ))}
-        {config.drivers.length > 2 && (
-          <Text style={styles.driverText}>
-            +{config.drivers.length - 2} more
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.baserateContainer}>
-        <Text style={styles.baserateLabel}>Base Rate:</Text>
-        <Text style={styles.baserateValue}>
-          {(config.baserate.probability * 100).toFixed(0)}%
-        </Text>
-      </View>
+      {/* Minimal action hint */}
+      <Text style={styles.actionHint}>Tap to view simulation →</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#16213e',
-    borderRadius: 16,
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: TufteColors.paper,
+    marginHorizontal: TufteLayout.marginHorizontal,
+    marginBottom: TufteSpacing.md,
+    padding: TufteSpacing.lg,
+    borderWidth: 1,
+    borderColor: TufteColors.border,
+    ...TufteLayout.shadow,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    marginBottom: TufteSpacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: TufteColors.text,
+    paddingBottom: TufteSpacing.sm,
   },
   ticker: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: TufteTypography.fontSize.xxl,
+    fontWeight: TufteTypography.fontWeight.bold,
+    color: TufteColors.text,
+    letterSpacing: -0.5,
   },
-  badge: {
-    backgroundColor: '#1aff92',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+  targetValue: {
+    fontSize: TufteTypography.fontSize.xl,
+    fontWeight: TufteTypography.fontWeight.normal,
+    color: TufteColors.text,
   },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#0f3460',
+  table: {
+    marginBottom: TufteSpacing.md,
   },
-  target: {
-    fontSize: 16,
-    color: '#aaa',
-    marginBottom: 16,
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: TufteSpacing.sm,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TufteColors.grid,
   },
-  driversContainer: {
-    marginBottom: 12,
+  tableLabel: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    width: 80,
+    paddingTop: 2,
   },
-  driversLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#1aff92',
-    marginBottom: 4,
+  tableValue: {
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.text,
+    flex: 1,
+    lineHeight: TufteTypography.lineHeight.normal * TufteTypography.fontSize.sm,
   },
-  driverText: {
-    fontSize: 12,
-    color: '#888',
-    marginLeft: 8,
-  },
-  baserateContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#0f3460',
-  },
-  baserateLabel: {
-    fontSize: 12,
-    color: '#aaa',
-  },
-  baserateValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1aff92',
+  actionHint: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textSecondary,
+    textAlign: "right",
+    fontStyle: "italic",
   },
 });

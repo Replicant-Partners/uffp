@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ForecastChart } from '../components/ForecastChart';
-import { DistributionChart } from '../components/DistributionChart';
-import { forecastService } from '../services/forecastService';
-import { SimulationResult } from '../types';
-import { RootStackParamList } from '../App';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { ForecastChart } from "../components/ForecastChart";
+import { DistributionChart } from "../components/DistributionChart";
+import { forecastService } from "../services/forecastService";
+import { SimulationResult } from "../types";
+import { RootStackParamList } from "../App";
+import { TufteColors, TufteTypography, TufteSpacing, TufteLayout } from "../styles/tufte";
 
-type ForecastDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'ForecastDetail'>;
+type ForecastDetailScreenProps = NativeStackScreenProps<RootStackParamList, "ForecastDetail">;
 
 export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ route }) => {
   const { config } = route.params;
@@ -29,9 +23,8 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
     setLoading(true);
     const simResult = await forecastService.runSimulation(config.drivers);
 
-    // Calculate probability above target
     const aboveTarget = simResult.histogram
-      .filter(h => h.value >= config.targetValue * 1_000_000)
+      .filter((h) => h.value >= config.targetValue * 1_000_000)
       .reduce((sum, h) => sum + h.count, 0);
 
     simResult.probabilityAboveTarget = aboveTarget / 10000;
@@ -44,9 +37,8 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1aff92" />
-          <Text style={styles.loadingText}>Running Monte Carlo Simulation...</Text>
-          <Text style={styles.loadingSubtext}>10,000 iterations</Text>
+          <ActivityIndicator size="small" color={TufteColors.text} />
+          <Text style={styles.loadingText}>Running simulation</Text>
         </View>
       </SafeAreaView>
     );
@@ -55,80 +47,102 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header: Ticker and Target */}
         <View style={styles.header}>
           <Text style={styles.ticker}>{config.ticker}</Text>
-          <Text style={styles.target}>
+          <Text style={styles.targetText}>
             Target: ${config.targetValue}M by {new Date(config.targetDate).getFullYear()}
           </Text>
         </View>
 
-        <View style={styles.probabilityCard}>
-          <Text style={styles.probabilityLabel}>Success Probability</Text>
-          <Text style={styles.probabilityValue}>
-            {(result.probabilityAboveTarget * 100).toFixed(1)}%
-          </Text>
-          <Text style={styles.probabilityDescription}>
-            Probability of reaching ${config.targetValue}M target
+        {/* Primary Result: Probability */}
+        <View style={styles.probabilitySection}>
+          <View style={styles.probabilityRow}>
+            <Text style={styles.probabilityLabel}>Probability of Success</Text>
+            <Text style={styles.probabilityValue}>
+              {(result.probabilityAboveTarget * 100).toFixed(1)}%
+            </Text>
+          </View>
+          <Text style={styles.probabilityNote}>
+            Likelihood of reaching ${config.targetValue}M target · 10,000 iterations
           </Text>
         </View>
 
+        {/* Charts */}
         <ForecastChart result={result} ticker={config.ticker} />
-
         <DistributionChart result={result} ticker={config.ticker} />
 
+        {/* Driver Table */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Forecast Drivers</Text>
+          <Text style={styles.sectionLabel}>Forecast Drivers</Text>
+          <Text style={styles.sectionNote}>
+            Independent variables sampled from specified distributions
+          </Text>
+
           {config.drivers.map((driver, index) => (
-            <View key={index} style={styles.driverCard}>
-              <Text style={styles.driverName}>{driver.name}</Text>
-              <Text style={styles.driverDescription}>{driver.description}</Text>
-              <View style={styles.driverParams}>
-                <Text style={styles.driverType}>
-                  Distribution: {driver.distributionType}
-                </Text>
-                <Text style={styles.driverUnit}>Unit: {driver.unit}</Text>
+            <View key={index} style={styles.driverItem}>
+              <View style={styles.driverHeader}>
+                <Text style={styles.driverNumber}>{index + 1}.</Text>
+                <Text style={styles.driverName}>{driver.name}</Text>
               </View>
-              <View style={styles.paramsList}>
-                {Object.entries(driver.parameters).map(([key, value]) => (
-                  <Text key={key} style={styles.paramItem}>
-                    {key}: {typeof value === 'number' ? value.toFixed(2) : value}
+
+              <View style={styles.driverTable}>
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableLabel}>Type</Text>
+                  <Text style={styles.tableValue}>{driver.distributionType}</Text>
+                </View>
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableLabel}>Parameters</Text>
+                  <Text style={styles.tableValue}>
+                    {Object.entries(driver.parameters)
+                      .map(([k, v]) => `${k}=${v}`)
+                      .join(", ")}
                   </Text>
-                ))}
+                </View>
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableLabel}>Unit</Text>
+                  <Text style={styles.tableValue}>{driver.unit}</Text>
+                </View>
               </View>
             </View>
           ))}
         </View>
 
+        {/* Base Rate */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Outside View (Base Rate)</Text>
-          <View style={styles.baserateCard}>
-            <Text style={styles.baserateText}>{config.baserate.description}</Text>
-            <View style={styles.baserateFooter}>
-              <Text style={styles.baserateProb}>
-                {(config.baserate.probability * 100).toFixed(0)}% historical success rate
-              </Text>
-              <Text style={styles.baserateSource}>Source: {config.baserate.source}</Text>
-            </View>
+          <Text style={styles.sectionLabel}>Outside View · Base Rate</Text>
+          <Text style={styles.baseRateText}>{config.baserate.description}</Text>
+          <View style={styles.baseRateStats}>
+            <Text style={styles.baseRateValue}>
+              {(config.baserate.probability * 100).toFixed(0)}%
+            </Text>
+            <Text style={styles.baseRateSource}>Source: {config.baserate.source}</Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pre-Mortem Analysis</Text>
-          {config.premortem.map((pm, index) => (
-            <View key={index} style={styles.premortemCard}>
-              <Text style={styles.premortemScenario}>{pm.scenario}</Text>
-              <Text style={styles.premortemFailure}>{pm.failureMode}</Text>
-            </View>
-          ))}
-        </View>
+        {/* Pre-Mortem */}
+        {config.premortem.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Pre-Mortem Analysis</Text>
+            <Text style={styles.sectionNote}>Failure modes identified ex ante</Text>
 
+            {config.premortem.map((pm, index) => (
+              <View key={index} style={styles.premortemItem}>
+                <Text style={styles.premortemScenario}>{pm.scenario}</Text>
+                <Text style={styles.premortemFailure}>{pm.failureMode}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Methodology Note */}
         <View style={styles.methodologySection}>
           <Text style={styles.methodologyTitle}>Methodology</Text>
           <Text style={styles.methodologyText}>
-            This forecast uses Tetlock Superforecasting methodology with Monte Carlo simulation.
-            Independent drivers are sampled from specified distributions 10,000 times to generate
-            a probability distribution of outcomes. The P10/P50/P90 values represent the 10th,
-            50th, and 90th percentiles of this distribution.
+            Tetlock Superforecasting: (1) Outside view establishes base rate. (2) Fermi
+            decomposition identifies {config.drivers.length} independent drivers. (3) Monte Carlo
+            simulation samples 10,000 times from specified distributions. (4) Results reported as
+            percentiles (P10, P50, P90) representing 10th, 50th, and 90th percentile outcomes.
           </Text>
         </View>
       </ScrollView>
@@ -139,178 +153,176 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f3460',
+    backgroundColor: TufteColors.background,
   },
   scrollContent: {
-    padding: 16,
+    paddingBottom: TufteSpacing.xxl,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
-    fontSize: 18,
-    color: '#fff',
-    marginTop: 16,
-  },
-  loadingSubtext: {
-    fontSize: 14,
-    color: '#aaa',
-    marginTop: 4,
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.textSecondary,
+    marginTop: TufteSpacing.sm,
   },
   header: {
-    marginBottom: 20,
+    padding: TufteLayout.marginHorizontal,
+    paddingTop: TufteSpacing.lg,
+    paddingBottom: TufteSpacing.md,
+    borderBottomWidth: 2,
+    borderBottomColor: TufteColors.text,
   },
   ticker: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: TufteTypography.fontSize.display,
+    fontWeight: TufteTypography.fontWeight.bold,
+    color: TufteColors.text,
+    letterSpacing: -1,
   },
-  target: {
-    fontSize: 16,
-    color: '#aaa',
-    marginTop: 4,
+  targetText: {
+    fontSize: TufteTypography.fontSize.base,
+    color: TufteColors.textSecondary,
+    marginTop: TufteSpacing.xs,
   },
-  probabilityCard: {
-    backgroundColor: '#16213e',
-    padding: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#1aff92',
+  probabilitySection: {
+    padding: TufteLayout.marginHorizontal,
+    paddingVertical: TufteSpacing.lg,
+    backgroundColor: TufteColors.paper,
+    borderBottomWidth: 1,
+    borderBottomColor: TufteColors.border,
+  },
+  probabilityRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    marginBottom: TufteSpacing.xs,
   },
   probabilityLabel: {
-    fontSize: 14,
-    color: '#aaa',
-    marginBottom: 8,
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.textSecondary,
   },
   probabilityValue: {
     fontSize: 48,
-    fontWeight: 'bold',
-    color: '#1aff92',
+    fontWeight: TufteTypography.fontWeight.normal,
+    color: TufteColors.text,
+    letterSpacing: -2,
+    fontVariant: ["tabular-nums"],
   },
-  probabilityDescription: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 8,
-    textAlign: 'center',
+  probabilityNote: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.xs,
   },
   section: {
-    marginTop: 16,
+    padding: TufteLayout.marginHorizontal,
+    paddingVertical: TufteSpacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: TufteColors.grid,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 12,
+  sectionLabel: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: TufteSpacing.xs,
   },
-  driverCard: {
-    backgroundColor: '#16213e',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+  sectionNote: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textSecondary,
+    marginBottom: TufteSpacing.md,
+    fontStyle: "italic",
+  },
+  driverItem: {
+    marginBottom: TufteSpacing.lg,
+  },
+  driverHeader: {
+    flexDirection: "row",
+    marginBottom: TufteSpacing.sm,
+  },
+  driverNumber: {
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.textTertiary,
+    marginRight: TufteSpacing.xs,
   },
   driverName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1aff92',
-    marginBottom: 4,
+    fontSize: TufteTypography.fontSize.base,
+    color: TufteColors.text,
+    fontWeight: TufteTypography.fontWeight.medium,
   },
-  driverDescription: {
-    fontSize: 14,
-    color: '#aaa',
-    marginBottom: 12,
+  driverTable: {
+    marginLeft: TufteSpacing.md,
   },
-  driverParams: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: TufteSpacing.xs,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TufteColors.grid,
   },
-  driverType: {
-    fontSize: 12,
-    color: '#888',
-    fontStyle: 'italic',
+  tableLabel: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    width: 80,
   },
-  driverUnit: {
-    fontSize: 12,
-    color: '#888',
+  tableValue: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.text,
+    flex: 1,
   },
-  paramsList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 8,
+  baseRateText: {
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.text,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.sm,
+    marginBottom: TufteSpacing.md,
   },
-  paramItem: {
-    fontSize: 12,
-    color: '#aaa',
-    backgroundColor: '#0f3460',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+  baseRateStats: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: TufteSpacing.md,
   },
-  baserateCard: {
-    backgroundColor: '#16213e',
-    padding: 16,
-    borderRadius: 12,
+  baseRateValue: {
+    fontSize: TufteTypography.fontSize.xxl,
+    fontWeight: TufteTypography.fontWeight.bold,
+    color: TufteColors.text,
   },
-  baserateText: {
-    fontSize: 14,
-    color: '#fff',
-    marginBottom: 12,
-    lineHeight: 20,
+  baseRateSource: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textSecondary,
+    fontStyle: "italic",
   },
-  baserateFooter: {
-    borderTopWidth: 1,
-    borderTopColor: '#0f3460',
-    paddingTop: 12,
-  },
-  baserateProb: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1aff92',
-    marginBottom: 4,
-  },
-  baserateSource: {
-    fontSize: 12,
-    color: '#888',
-  },
-  premortemCard: {
-    backgroundColor: '#16213e',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ff6b6b',
+  premortemItem: {
+    marginBottom: TufteSpacing.md,
+    paddingLeft: TufteSpacing.md,
+    borderLeftWidth: 2,
+    borderLeftColor: TufteColors.dataAccent,
   },
   premortemScenario: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#ff6b6b',
-    marginBottom: 4,
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.dataAccent,
+    fontWeight: TufteTypography.fontWeight.semibold,
+    marginBottom: TufteSpacing.xs,
   },
   premortemFailure: {
-    fontSize: 14,
-    color: '#aaa',
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.text,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.sm,
   },
   methodologySection: {
-    backgroundColor: '#16213e',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 16,
-    marginBottom: 32,
+    padding: TufteLayout.marginHorizontal,
+    paddingVertical: TufteSpacing.lg,
+    backgroundColor: TufteColors.paper,
   },
   methodologyTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1aff92',
-    marginBottom: 8,
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: TufteSpacing.sm,
   },
   methodologyText: {
-    fontSize: 12,
-    color: '#aaa',
-    lineHeight: 18,
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textSecondary,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.xs,
   },
 });

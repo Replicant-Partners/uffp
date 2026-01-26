@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ForecastCard } from "../components/ForecastCard";
 import { forecastService } from "../services/forecastService";
 import { RootStackParamList } from "../App";
+import { TufteColors, TufteTypography, TufteSpacing, TufteLayout } from "../styles/tufte";
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -15,18 +16,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>UFFP Forecasts</Text>
-        <Text style={styles.subtitle}>Tetlock Probabilistic Forecasting</Text>
+        <Text style={styles.title}>Probabilistic Forecasting</Text>
+        <Text style={styles.subtitle}>
+          Tetlock Superforecasting methodology — Monte Carlo simulation — Brier scoring
+        </Text>
       </View>
 
-      <TouchableOpacity
-        style={styles.createButton}
-        onPress={() => navigation.navigate("CreateForecast")}
-      >
-        <Text style={styles.createButtonText}>+ Create Custom Forecast</Text>
-      </TouchableOpacity>
+      <View style={styles.createSection}>
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={() => navigation.navigate("CreateForecast")}
+        >
+          <Text style={styles.createButtonText}>New Forecast</Text>
+        </TouchableOpacity>
+        <Text style={styles.createHint}>
+          Build probabilistic predictions with explicit uncertainty quantification
+        </Text>
+      </View>
 
-      <Text style={styles.examplesTitle}>Example Forecasts</Text>
+      <View style={styles.divider} />
+
+      <Text style={styles.sectionLabel}>Example Forecasts</Text>
 
       <FlatList
         data={forecasts}
@@ -46,49 +56,65 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f3460",
+    backgroundColor: TufteColors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 40,
+    paddingHorizontal: TufteLayout.marginHorizontal,
+    paddingTop: TufteSpacing.xl,
+    paddingBottom: TufteSpacing.lg,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 4,
+    fontSize: TufteTypography.fontSize.display,
+    fontWeight: TufteTypography.fontWeight.normal,
+    color: TufteColors.text,
+    letterSpacing: -0.5,
+    marginBottom: TufteSpacing.sm,
   },
   subtitle: {
-    fontSize: 14,
-    color: "#1aff92",
+    fontSize: TufteTypography.fontSize.sm,
+    color: TufteColors.textSecondary,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.sm,
+    maxWidth: TufteLayout.maxWidth,
+  },
+  createSection: {
+    paddingHorizontal: TufteLayout.marginHorizontal,
+    marginBottom: TufteSpacing.lg,
   },
   createButton: {
-    backgroundColor: "#1aff92",
-    margin: 16,
-    marginTop: 0,
-    padding: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    shadowColor: "#1aff92",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: TufteColors.text,
+    paddingVertical: TufteSpacing.md,
+    paddingHorizontal: TufteSpacing.lg,
+    alignSelf: "flex-start",
+    marginBottom: TufteSpacing.sm,
   },
   createButtonText: {
-    color: "#0f3460",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: TufteTypography.fontSize.base,
+    color: TufteColors.text,
+    fontWeight: TufteTypography.fontWeight.medium,
+    letterSpacing: 0.3,
   },
-  examplesTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    marginLeft: 16,
-    marginBottom: 8,
-    marginTop: 8,
+  createHint: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.xs,
+    maxWidth: 300,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: TufteColors.grid,
+    marginHorizontal: TufteLayout.marginHorizontal,
+    marginVertical: TufteSpacing.lg,
+  },
+  sectionLabel: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    paddingHorizontal: TufteLayout.marginHorizontal,
+    marginBottom: TufteSpacing.md,
   },
   listContent: {
-    paddingBottom: 20,
+    paddingBottom: TufteSpacing.xxl,
   },
 });
