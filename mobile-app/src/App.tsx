@@ -1,13 +1,15 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { HomeScreen } from './screens/HomeScreen';
-import { ForecastDetailScreen } from './screens/ForecastDetailScreen';
-import { ForecastConfig } from './types';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { HomeScreen } from "./screens/HomeScreen";
+import { ForecastDetailScreen } from "./screens/ForecastDetailScreen";
+import { CreateForecastScreen } from "./screens/CreateForecastScreen";
+import { ForecastConfig } from "./types";
 
 export type RootStackParamList = {
   Home: undefined;
   ForecastDetail: { config: ForecastConfig };
+  CreateForecast: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -18,23 +20,24 @@ export default function App() {
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#0f3460',
+            backgroundColor: "#0f3460",
           },
-          headerTintColor: '#1aff92',
+          headerTintColor: "#1aff92",
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: "bold",
           },
         }}
       >
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }}
+          name="CreateForecast"
+          component={CreateForecastScreen}
+          options={{ title: "Create Forecast" }}
         />
         <Stack.Screen
           name="ForecastDetail"
           component={ForecastDetailScreen}
-          options={{ title: 'Forecast Analysis' }}
+          options={{ title: "Forecast Analysis" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
