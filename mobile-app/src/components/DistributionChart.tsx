@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: TufteTypography.fontSize.xs,
     color: TufteColors.text,
-    fontWeight: TufteTypography.fontWeight.medium,
+    fontWeight: '500' as const,
     fontVariant: ["tabular-nums"],
   },
 });

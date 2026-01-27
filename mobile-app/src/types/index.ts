@@ -1,7 +1,25 @@
+export interface Evidence {
+  id: string;
+  type:
+    | "research"
+    | "web_article"
+    | "competitor_data"
+    | "internal_data"
+    | "expert_opinion"
+    | "sentiment_analysis";
+  title: string;
+  source: string;
+  url?: string;
+  summary: string;
+  keyFinding: string;
+  date: string;
+  relevance: "high" | "medium" | "low";
+}
+
 export interface ForecastDriver {
   name: string;
   description: string;
-  distributionType: 'triangular' | 'normal' | 'beta' | 'uniform';
+  distributionType: "triangular" | "normal" | "beta" | "uniform";
   parameters: {
     low?: number;
     mode?: number;
@@ -12,11 +30,14 @@ export interface ForecastDriver {
     beta?: number;
   };
   unit: string;
+  rationale?: string; // Why these parameters were chosen
+  evidence?: Evidence[]; // Supporting evidence for parameter choices
+  distributionRationale?: string; // Why this distribution type was chosen
 }
 
 export interface ForecastConfig {
   ticker: string;
-  targetMetric: 'revenue' | 'marketCap' | 'profitability';
+  targetMetric: "revenue" | "marketCap" | "profitability";
   targetValue: number;
   targetDate: string;
   drivers: ForecastDriver[];
@@ -61,5 +82,5 @@ export interface LeaderboardEntry {
   calibration: number;
   totalForecasts: number;
   resolvedForecasts: number;
-  status: 'Superforecaster' | 'Pro Analyst' | 'Emerging';
+  status: "Superforecaster" | "Pro Analyst" | "Emerging";
 }

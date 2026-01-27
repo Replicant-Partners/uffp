@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   dataValue: {
     fontSize: TufteTypography.fontSize.sm,
     color: TufteColors.text,
-    fontWeight: TufteTypography.fontWeight.semibold,
+    fontWeight: '600' as const,
     fontVariant: ["tabular-nums"],
   },
   chart: {

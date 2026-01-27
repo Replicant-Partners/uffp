@@ -77,13 +77,13 @@ const styles = StyleSheet.create({
   },
   ticker: {
     fontSize: TufteTypography.fontSize.xxl,
-    fontWeight: TufteTypography.fontWeight.bold,
+    fontWeight: '700' as const,
     color: TufteColors.text,
     letterSpacing: -0.5,
   },
   targetValue: {
     fontSize: TufteTypography.fontSize.xl,
-    fontWeight: TufteTypography.fontWeight.normal,
+    fontWeight: '400' as const,
     color: TufteColors.text,
   },
   table: {

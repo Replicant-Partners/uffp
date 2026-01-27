@@ -10,29 +10,32 @@
  */
 
 export const TufteColors = {
-  // Neutral tones (Tschichold palette)
-  background: '#FAFAFA',
-  paper: '#FFFFFF',
-  text: '#1A1A1A',
-  textSecondary: '#666666',
-  textTertiary: '#999999',
+  // Dark charcoal/brown palette
+  background: "#2B2520", // Dark charcoal brown
+  backgroundSecondary: "#332D28", // Slightly lighter
+  paper: "#3A342E", // Paper surface
+  text: "#F5EFE7", // Soft cream
+  textSecondary: "#D4C4B0", // Muted cream
+  textTertiary: "#A89B8C", // Darker muted cream
 
-  // Functional colors (minimal, purposeful)
-  dataLine: '#1A1A1A',
-  dataAccent: '#DC143C', // Crimson for emphasis
-  grid: '#E0E0E0',
-  border: '#CCCCCC',
+  // Functional colors (muted yellow/orange)
+  dataLine: "#E8B87E", // Muted gold
+  dataAccent: "#D89B5A", // Burnt orange
+  grid: "#4A4238", // Subtle grid
+  border: "#5A4F45", // Muted border
 
-  // Semantic colors (restrained)
-  success: '#2E7D32',
-  warning: '#F57C00',
-  error: '#C62828',
+  // Semantic colors (muted tones)
+  success: "#9CAF88", // Muted olive green
+  warning: "#D89B5A", // Burnt orange
+  error: "#B87E6C", // Muted terracotta
 
-  // Chart colors (distinguishable, not garish)
-  chart1: '#1A1A1A',
-  chart2: '#666666',
-  chart3: '#999999',
-  chartEmphasis: '#DC143C',
+  // Chart colors (muted yellow/orange palette)
+  chart1: "#E8B87E", // Muted gold
+  chart2: "#D89B5A", // Burnt orange
+  chart3: "#C9894B", // Deep orange
+  chart4: "#A89B8C", // Taupe
+  chart5: "#F5D9A8", // Pale gold
+  chartEmphasis: "#D89B5A", // Burnt orange emphasis
 };
 
 export const TufteTypography = {
@@ -63,10 +66,10 @@ export const TufteTypography = {
 
   // Font weights (minimal palette)
   fontWeight: {
-    normal: '400',
-    medium: '500',
-    semibold: '600',
-    bold: '700',
+    normal: "400",
+    medium: "500",
+    semibold: "600",
+    bold: "700",
   },
 };
 
@@ -93,7 +96,7 @@ export const TufteLayout = {
 
   // Shadows (minimal)
   shadow: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -107,20 +110,21 @@ export const TufteChartConfig = {
   backgroundGradientFrom: TufteColors.paper,
   backgroundGradientTo: TufteColors.paper,
 
-  // Data ink (high contrast)
-  color: (opacity = 1) => `rgba(26, 26, 26, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(26, 26, 26, ${opacity})`,
+  // Data ink (muted gold)
+  color: (opacity = 1) => `rgba(232, 184, 126, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(245, 239, 231, ${opacity})`,
 
   // Minimal decoration
   decimalPlaces: 1,
   propsForBackgroundLines: {
-    strokeDasharray: '', // Solid, not dashed
+    strokeDasharray: "", // Solid, not dashed
     stroke: TufteColors.grid,
     strokeWidth: 0.5,
   },
   propsForLabels: {
     fontSize: 11,
     fontFamily: TufteTypography.fontFamily.sans,
+    fill: "#F5EFE7",
   },
 
   // No fills, lines only
@@ -129,6 +133,6 @@ export const TufteChartConfig = {
 
   // Emphasis
   propsForDots: {
-    r: '0', // No dots by default
+    r: "0", // No dots by default
   },
 };

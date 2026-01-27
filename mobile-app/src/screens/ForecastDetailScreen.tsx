@@ -7,6 +7,8 @@ import { forecastService } from "../services/forecastService";
 import { SimulationResult } from "../types";
 import { RootStackParamList } from "../App";
 import { TufteColors, TufteTypography, TufteSpacing, TufteLayout } from "../styles/tufte";
+import { InfoTooltip } from "../components/InfoTooltip";
+import { GLOSSARY } from "../constants/glossary";
 
 type ForecastDetailScreenProps = NativeStackScreenProps<RootStackParamList, "ForecastDetail">;
 
@@ -58,7 +60,11 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
         {/* Primary Result: Probability */}
         <View style={styles.probabilitySection}>
           <View style={styles.probabilityRow}>
-            <Text style={styles.probabilityLabel}>Probability of Success</Text>
+            <InfoTooltip
+              term={GLOSSARY.SUCCESS_PROBABILITY.term}
+              definition={GLOSSARY.SUCCESS_PROBABILITY.definition}
+              example={GLOSSARY.SUCCESS_PROBABILITY.example}
+            />
             <Text style={styles.probabilityValue}>
               {(result.probabilityAboveTarget * 100).toFixed(1)}%
             </Text>
@@ -74,7 +80,14 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
 
         {/* Driver Table */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Forecast Drivers</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionLabel}>Forecast Drivers</Text>
+            <InfoTooltip
+              term={GLOSSARY.FERMI_DECOMPOSITION.term}
+              definition={GLOSSARY.FERMI_DECOMPOSITION.definition}
+              example={GLOSSARY.FERMI_DECOMPOSITION.example}
+            />
+          </View>
           <Text style={styles.sectionNote}>
             Independent variables sampled from specified distributions
           </Text>
@@ -103,7 +116,57 @@ export const ForecastDetailScreen: React.FC<ForecastDetailScreenProps> = ({ rout
                   <Text style={styles.tableLabel}>Unit</Text>
                   <Text style={styles.tableValue}>{driver.unit}</Text>
                 </View>
+                {driver.rationale && (
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableLabel}>Rationale</Text>
+                    <Text style={styles.tableValue}>{driver.rationale}</Text>
+                  </View>
+                )}
               </View>
+
+              {/* Evidence */}
+              {driver.evidence && driver.evidence.length > 0 && (
+                <View style={styles.evidenceSection}>
+                  <Text style={styles.evidenceHeader}>
+                    Supporting Evidence ({driver.evidence.length})
+                  </Text>
+                  {driver.evidence.map((evidence) => (
+                    <View key={evidence.id} style={styles.evidenceCard}>
+                      <View style={styles.evidenceCardHeader}>
+                        <View
+                          style={[
+                            styles.relevanceBadge,
+                            {
+                              backgroundColor:
+                                evidence.relevance === "high"
+                                  ? TufteColors.dataAccent
+                                  : evidence.relevance === "medium"
+                                    ? TufteColors.warning
+                                    : TufteColors.textTertiary,
+                            },
+                          ]}
+                        />
+                        <Text style={styles.evidenceType}>
+                          {evidence.type.replace("_", " ").toUpperCase()}
+                        </Text>
+                      </View>
+                      <Text style={styles.evidenceTitle}>{evidence.title}</Text>
+                      <Text style={styles.evidenceSource}>
+                        {evidence.source} · {evidence.date}
+                      </Text>
+                      <View style={styles.evidenceKeyFinding}>
+                        <Text style={styles.evidenceKeyFindingLabel}>Key Finding</Text>
+                        <Text style={styles.evidenceKeyFindingText}>{evidence.keyFinding}</Text>
+                      </View>
+                      {evidence.url && (
+                        <Text style={styles.evidenceUrl} numberOfLines={1}>
+                          {evidence.url}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           ))}
         </View>
@@ -177,7 +240,7 @@ const styles = StyleSheet.create({
   },
   ticker: {
     fontSize: TufteTypography.fontSize.display,
-    fontWeight: TufteTypography.fontWeight.bold,
+    fontWeight: '700' as const,
     color: TufteColors.text,
     letterSpacing: -1,
   },
@@ -205,7 +268,7 @@ const styles = StyleSheet.create({
   },
   probabilityValue: {
     fontSize: 48,
-    fontWeight: TufteTypography.fontWeight.normal,
+    fontWeight: '400' as const,
     color: TufteColors.text,
     letterSpacing: -2,
     fontVariant: ["tabular-nums"],
@@ -221,12 +284,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: TufteColors.grid,
   },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: TufteSpacing.sm,
+    marginBottom: TufteSpacing.xs,
+  },
   sectionLabel: {
     fontSize: TufteTypography.fontSize.xs,
     color: TufteColors.textTertiary,
     textTransform: "uppercase",
     letterSpacing: 1,
-    marginBottom: TufteSpacing.xs,
   },
   sectionNote: {
     fontSize: TufteTypography.fontSize.xs,
@@ -249,7 +317,7 @@ const styles = StyleSheet.create({
   driverName: {
     fontSize: TufteTypography.fontSize.base,
     color: TufteColors.text,
-    fontWeight: TufteTypography.fontWeight.medium,
+    fontWeight: '500' as const,
   },
   driverTable: {
     marginLeft: TufteSpacing.md,
@@ -283,7 +351,7 @@ const styles = StyleSheet.create({
   },
   baseRateValue: {
     fontSize: TufteTypography.fontSize.xxl,
-    fontWeight: TufteTypography.fontWeight.bold,
+    fontWeight: '700' as const,
     color: TufteColors.text,
   },
   baseRateSource: {
@@ -300,7 +368,7 @@ const styles = StyleSheet.create({
   premortemScenario: {
     fontSize: TufteTypography.fontSize.sm,
     color: TufteColors.dataAccent,
-    fontWeight: TufteTypography.fontWeight.semibold,
+    fontWeight: '600' as const,
     marginBottom: TufteSpacing.xs,
   },
   premortemFailure: {
@@ -324,5 +392,75 @@ const styles = StyleSheet.create({
     fontSize: TufteTypography.fontSize.xs,
     color: TufteColors.textSecondary,
     lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.xs,
+  },
+  evidenceSection: {
+    marginTop: TufteSpacing.md,
+    borderTopWidth: 1,
+    borderTopColor: TufteColors.grid,
+    paddingTop: TufteSpacing.md,
+  },
+  evidenceHeader: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    marginBottom: TufteSpacing.sm,
+  },
+  evidenceCard: {
+    backgroundColor: TufteColors.background,
+    padding: TufteSpacing.md,
+    marginBottom: TufteSpacing.sm,
+    borderWidth: 1,
+    borderColor: TufteColors.border,
+  },
+  evidenceCardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: TufteSpacing.xs,
+    marginBottom: TufteSpacing.xs,
+  },
+  relevanceBadge: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  evidenceType: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    letterSpacing: 0.5,
+  },
+  evidenceTitle: {
+    fontSize: TufteTypography.fontSize.sm,
+    fontWeight: '500' as const,
+    color: TufteColors.text,
+    marginBottom: TufteSpacing.xs / 2,
+  },
+  evidenceSource: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textSecondary,
+    marginBottom: TufteSpacing.xs,
+  },
+  evidenceKeyFinding: {
+    borderLeftWidth: 2,
+    borderLeftColor: TufteColors.dataAccent,
+    paddingLeft: TufteSpacing.sm,
+    marginBottom: TufteSpacing.xs,
+  },
+  evidenceKeyFindingLabel: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  evidenceKeyFindingText: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.text,
+    lineHeight: TufteTypography.lineHeight.relaxed * TufteTypography.fontSize.xs,
+  },
+  evidenceUrl: {
+    fontSize: TufteTypography.fontSize.xs,
+    color: TufteColors.dataAccent,
+    fontStyle: "italic",
   },
 });

@@ -4,12 +4,19 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HomeScreen } from "./screens/HomeScreen";
 import { ForecastDetailScreen } from "./screens/ForecastDetailScreen";
 import { CreateForecastScreen } from "./screens/CreateForecastScreen";
+import { CompareScreen } from "./screens/CompareScreen";
+import { BrierScoreScreen } from "./screens/BrierScoreScreen";
+import { CalibrationScreen } from "./screens/CalibrationScreen";
 import { ForecastConfig } from "./types";
+import { TufteColors } from "./styles/tufte";
 
 export type RootStackParamList = {
   Home: undefined;
   ForecastDetail: { config: ForecastConfig };
   CreateForecast: undefined;
+  Compare: { configs: ForecastConfig[] };
+  BrierScore: undefined;
+  Calibration: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,12 +27,15 @@ export default function App() {
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: "#0f3460",
+            backgroundColor: TufteColors.paper,
           },
-          headerTintColor: "#1aff92",
+          headerTintColor: TufteColors.text,
           headerTitleStyle: {
-            fontWeight: "bold",
+            fontWeight: "400",
+            fontSize: 18,
+            color: TufteColors.text,
           },
+          headerShadowVisible: true,
         }}
       >
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
@@ -38,6 +48,21 @@ export default function App() {
           name="ForecastDetail"
           component={ForecastDetailScreen}
           options={{ title: "Forecast Analysis" }}
+        />
+        <Stack.Screen
+          name="Compare"
+          component={CompareScreen}
+          options={{ title: "Comparative Analysis" }}
+        />
+        <Stack.Screen
+          name="BrierScore"
+          component={BrierScoreScreen}
+          options={{ title: "Brier Score Analysis" }}
+        />
+        <Stack.Screen
+          name="Calibration"
+          component={CalibrationScreen}
+          options={{ title: "Calibration & Leaderboard" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
